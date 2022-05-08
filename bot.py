@@ -23,7 +23,7 @@ def unknown(update: Update, context: CallbackContext):
 
 def add_notition(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_chat.id, text="OKOK")
-    logging.info("New ID:"+update.effective_chat.id)
+    logging.info("New ID:"+str(update.effective_chat.id))
 
 
 def send_notition():
@@ -83,11 +83,12 @@ if __name__ == "__main__":
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
 
+    add_handler = CommandHandler("addme", add_notition)
+    dispatcher.add_handler(add_handler)
+
     unknown_handler = MessageHandler(Filters.command, unknown)
     dispatcher.add_handler(unknown_handler)
 
-    add_handler = CommandHandler("addme", add_notition)
-    dispatcher.add_handler(add_handler)
     tg_clinet()
 
 
