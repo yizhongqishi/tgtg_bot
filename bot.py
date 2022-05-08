@@ -69,12 +69,13 @@ def tg_clinet():
                 logging.info("New things, hurry up!")
                 send_notition()
                 send = True
-                pass
             else:
                 time.sleep(random.randrange(50, 60))
         except Exception as e:
             logging.error(e)
             send_alert()
+            break
+
 
 
 if __name__ == "__main__":
