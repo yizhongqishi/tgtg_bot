@@ -62,7 +62,7 @@ def tg_clinet():
         if send:
             now = daytime()
             while now < 1915:
-                time = time.sleep(36000)
+                time.sleep(36000)
         try:
             item = client.get_item(600644)
             if item['items_available'] > 0:
