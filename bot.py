@@ -49,7 +49,7 @@ def tg_clinet():
     with open("tg.token", "r") as f:
         data = json.load(f)
     client = TgtgClient(access_token=data["access_token"], refresh_token=data["refresh_token"], user_id=data["user_id"])
-
+    send = False
     while True:
         now = daytime()
         if now >= 1915 or now <= 1200:
@@ -58,11 +58,17 @@ def tg_clinet():
                 now = daytime()
                 time.sleep(600)
             logging.info("Time to Wake Up")
+            send = False
+        if send:
+            now = daytime()
+            while now < 1915:
+                time = time.sleep(36000)
         try:
             item = client.get_item(600644)
             if item['items_available'] > 0:
                 logging.info("New things, hurry up!")
                 send_notition()
+                send = True
                 pass
             else:
                 time.sleep(random.randrange(50, 60))
