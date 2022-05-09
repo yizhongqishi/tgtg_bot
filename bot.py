@@ -33,10 +33,10 @@ def send_notition():
             bot.send_message(chat_id=int(id), text="New Items!")
 
 
-def send_alert():
+def send_alert(mes = "Something Wrong!"):
     with open("admin.id", "r") as f:
         admin_id = f.readline()
-        bot.send_message(chat_id=int(admin_id), text="Something Wrong!")
+        bot.send_message(chat_id=int(admin_id), text=mes)
 
 
 def daytime():
@@ -54,15 +54,18 @@ def tg_clinet():
         now = daytime()
         if now >= 1915 or now <= 1200:
             logging.info("Sleeping Time")
+            send_alert("I'm Sleeping")
             while now >= 1915 or now <= 1200:
                 now = daytime()
                 time.sleep(600)
             logging.info("Time to Wake Up")
+            send_alert("I'm Working")
             send = False
+        #  sleep 1 hr if have sent before
         if send:
-            now = daytime()
-            while now < 1915:
-                time.sleep(36000)
+            time.sleep(3600)
+            send = False
+            send_alert("I will sleep 1 hr now")
         try:
             item = client.get_item(600644)
             if item['items_available'] > 0:
@@ -75,7 +78,6 @@ def tg_clinet():
             logging.error(e)
             send_alert()
             break
-
 
 
 if __name__ == "__main__":
@@ -98,9 +100,3 @@ if __name__ == "__main__":
 
     tg_clinet()
     updater.stop()
-
-
-
-
-
-
