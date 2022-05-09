@@ -33,7 +33,7 @@ def send_notition():
             bot.send_message(chat_id=int(id), text="New Items!")
 
 
-def send_alert(mes = "Something Wrong!"):
+def send_alert(mes="Something Wrong!"):
     with open("admin.id", "r") as f:
         admin_id = f.readline()
         bot.send_message(chat_id=int(admin_id), text=mes)
@@ -65,6 +65,7 @@ def tg_clinet():
         if send:
             time.sleep(3600)
             send = False
+            logging.info("Sleep 1 hr")
             send_alert("I will sleep 1 hr now")
         try:
             item = client.get_item(600644)
