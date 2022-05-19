@@ -4,7 +4,7 @@ from telegram.ext import CommandHandler
 from telegram import Update
 from telegram.ext import CallbackContext
 from telegram.ext import MessageHandler, Filters
-from pprint import pprint
+import os
 import json
 from tgtg import TgtgClient
 import time
@@ -16,6 +16,7 @@ send = False
 sleep_from = 1917
 sleep_to = 900
 item_id = 600644
+ss = False
 
 
 def start(update: Update, context: CallbackContext):
@@ -30,6 +31,13 @@ def unknown(update: Update, context: CallbackContext):
 def add_notion(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_chat.id, text="OKOK")
     logging.info("Please Add New ID:"+str(update.effective_chat.id))
+
+
+def stop(update: Update, context: CallbackContext):
+    global ss
+    context.bot.send_message(chat_id=update.effective_chat.id, text="See You Soon!".format(state))
+    ss = True
+    os._exit(0)
 
 
 def send_notion(mes="New Items!", user="common"):
@@ -67,28 +75,39 @@ def tg_client():
     client = TgtgClient(access_token=data["access_token"], refresh_token=data["refresh_token"], user_id=data["user_id"])
     logging.info("I'm going to work")
     while True:
+        if ss:
+            break
         now = daytime()
-        if now >= sleep_from or now <= sleep_to or send:
-            send = (sleep_from > now > sleep_to)
-            logging.info("Current time is {}, still sleeping".format(now))
-            time.sleep(60)
-        else:
-            try:
-                send_notion("Wake up now")
-                state = "Watching"
-                item = client.get_item(item_id)
-                if item['items_available'] > 0:
-                    logging.info("New things, hurry up!")
-                    send_notion()
-                    state = "Sleeping"
-                    send_notion("I'm Sleeping")
-                    send = True
-                else:
-                    time.sleep(random.randrange(20, 30))
-            except Exception as e:
-                logging.error(e)
-                send_alert()
-                break
+        if now >= sleep_from or now < sleep_to or send:
+            state = "Sleeping"
+            while now >= sleep_from or now <= sleep_to or send:
+                send = (sleep_to < now < sleep_from)
+                t = 60
+                if not send:
+                    if now >= sleep_from:
+                        t = 2400 - now + sleep_to
+                    else:
+                        t = sleep_to - now
+                    t = t // 100 * 3600 + (t % 100) * 60
+                logging.info("Current time is {}, will sleep {} hrs ({} mins)".format(now, t / 3600, t // 60))
+                time.sleep(t)
+                now = daytime()
+            send_notion("Wake up now")
+            state = "Watching"
+        try:
+            item = client.get_item(item_id)
+            if item['items_available'] > 0:
+                logging.info("New things, hurry up!")
+                send_notion()
+                state = "Sleeping"
+                send_notion("I'm Sleeping")
+                send = True
+            else:
+                time.sleep(random.randrange(20, 30))
+        except Exception as e:
+            logging.error(e)
+            send_alert()
+            break
 
 
 if __name__ == "__main__":
@@ -110,6 +129,9 @@ if __name__ == "__main__":
 
     check_handler = CommandHandler("still", check_again)
     dispatcher.add_handler(check_handler)
+
+    stop_handler = CommandHandler("stop", stop)
+    dispatcher.add_handler(stop_handler)
 
     unknown_handler = MessageHandler(Filters.command, unknown)
     dispatcher.add_handler(unknown_handler)
