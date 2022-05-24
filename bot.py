@@ -67,6 +67,10 @@ def daytime():
     return result
 
 
+def send_station(update: Update, context: CallbackContext):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="the send station is {}".format(send))
+
+
 def tg_client():
     global send
     global state
@@ -85,7 +89,7 @@ def tg_client():
                 t = 60
                 if not send:
                     if now >= sleep_from:
-                        t = 2400 - now + sleep_to
+                        t = (23 - (now // 100)) * 100 + 60 - (now % 100) + sleep_to
                     else:
                         t = sleep_to - now
                     t = t // 100 * 3600 + (t % 100) * 60
