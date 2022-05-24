@@ -134,6 +134,9 @@ if __name__ == "__main__":
     check_handler = CommandHandler("still", check_again)
     dispatcher.add_handler(check_handler)
 
+    send_handler = CommandHandler("send", send_station)
+    dispatcher.add_handler(send_handler)
+
     stop_handler = CommandHandler("stop", stop)
     dispatcher.add_handler(stop_handler)
 
